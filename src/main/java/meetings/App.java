@@ -5,14 +5,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class App {
     //static String datePattern =
     // static SimpleDateFormat ft = new SimpleDateFormat (datePattern);
 
     ArrayList<Room> rooms;
-
     ArrayList<Participant> users;
+
+    private static Logger log = Logger.getLogger(App.class.getName());
+
 
     public App() {
         rooms = new ArrayList<>();
@@ -21,8 +24,6 @@ public class App {
 
     public static void main(String[] args) {
         App mainApp = new App();
-
-
         //  Block of code to try
         /**MeetingTime testMeetingTime =new MeetingTime(2018,11,4,6,0,1.5);
          testMeetingTime.print();
@@ -150,10 +151,11 @@ public class App {
 
     public void createMeetingTime(MeetingTime curMeetingTime) {
         System.out.println("Enter meeting start date");
-
         System.out.println("Format:");
         //new MeetingTime;
         new MeetingTime(2018, 11, 4, 6, 0, -2);
+        log.info("Meeting time created "+ curMeetingTime);
+
     }
 
     public Room getRoom(String roomName) {
@@ -165,16 +167,21 @@ public class App {
     }
 
     public void removeRoom(String roomName) {
-        if (getRoom(roomName) != null)
+        if (getRoom(roomName) != null){
             rooms.remove(getRoom(roomName));
+            log.info("removed room "+roomName+" ");
+
+        }
     }
 
     public void addRoom(String roomName){
         this.rooms.add(new Room(roomName));
+        log.info("added room "+roomName);
     }
 
     public void addUser(String userName){
         this.users.add(new Participant(userName));
+        log.info("added user "+userName);
     }
 
     public Participant getUser(String userName) {
@@ -185,8 +192,10 @@ public class App {
     }
 
     public void removeUser(String userName) {
-        if (getRoom(userName) != null)
+        if (getRoom(userName) != null){
             users.remove(getRoom(userName));
+            log.info("removed user "+userName+" ");
+        }
     }
 
     public void printAllRooms(){

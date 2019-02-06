@@ -2,19 +2,26 @@ package meetings;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.logging.Logger;
 
 public class MeetingTime {
 
     GregorianCalendar startDate;
 
+    private static Logger log = Logger.getLogger(MeetingTime.class.getName());
+
+
     public void setStartDate(GregorianCalendar startDate) {
         this.startDate = startDate;
+        log.info("Start date set");
     }
 
     GregorianCalendar finishDate;
 
     public void setFinishDate(GregorianCalendar finishDate) {
         this.finishDate = finishDate;
+        log.info("Finish date set");
+
     }
 
     static long oneHour = 60*60*1000L;
@@ -40,6 +47,9 @@ public class MeetingTime {
         this.finishDate = new GregorianCalendar(year, month, date, hour, minute);
         long original = startDate.getTimeInMillis();
         finishDate.setTimeInMillis(original+(long)(MeetingTime.oneHour*meetingLen));
+
+        log.info("Meeting time created "+this);
+
     }
 
     public long getLengthInMillis(){

@@ -2,14 +2,17 @@ package meetings;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.logging.Logger;
 
 public class Room {
-
 
     String name;
 
     ArrayList<MeetingTime> availableTime;
     ArrayList<Meeting> meetings;
+
+    private static Logger log = Logger.getLogger(Room.class.getName());
+
 
     public Room(int id) {
         this.name = "room"+id;
@@ -18,10 +21,10 @@ public class Room {
     }
 
     public Room(String name) {
-
         this.name = name;
         this.availableTime = new ArrayList<MeetingTime>();
         this.meetings = new ArrayList<Meeting>();
+        log.info("Created Room "+name+" "+ this);
     }
 
     public void addAvailableTime(MeetingTime timeToAdd){
@@ -49,6 +52,8 @@ public class Room {
                 this.availableTime.remove(i+1);
                 i--;
             }
+            log.info("Added available time for room "+this.name+" "+ this);
+
         }
 
 
@@ -78,7 +83,6 @@ public class Room {
         return false;
     }
 
-
     public void swapAvailableTime(int i, int j)
     {
         MeetingTime tempMT = this.availableTime.get(j);
@@ -107,6 +111,8 @@ public class Room {
                 this.availableTime.add(i+1,tempMeetingTime);
 
                 i = this.availableTime.size();
+                log.info("Added Meeting for room "+this.name+" "+ this);
+
             }
 
         }
@@ -126,14 +132,6 @@ public class Room {
 
     public void print(){
         System.out.println("Room name - "+ this.getName());
-
-
-
-
-
-
-
-        
         System.out.println("Available time:");
         this.printAvailableTime();
         System.out.println("Meetings:");
