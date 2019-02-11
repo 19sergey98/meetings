@@ -13,7 +13,6 @@ public class Room {
 
     private static Logger log = Logger.getLogger(Room.class.getName());
 
-
     public Room(int id) {
         this.name = "room"+id;
         this.availableTime = new ArrayList<MeetingTime>();
@@ -90,6 +89,15 @@ public class Room {
         this.availableTime.set(i,tempMT);
     }
 
+    public Meeting getMeeting(String meetingName){
+        for(int i = 0; i< this.meetings.size(); i++)
+            if(this.meetings.get(i).getName().equals(meetingName)){
+                log.info("Got meeting " + this.meetings.get(i)+" named "+meetingName);
+                return this.meetings.get(i);
+            }
+        return null;
+    }
+
     public void addMeeting(Meeting tempMeeting){
         for(int i = 0; i< this.availableTime.size(); i++){
             //there is time
@@ -126,6 +134,42 @@ public class Room {
 
     }
 
+    public void removeMeeting(String meetingName){
+        Meeting tempMeeting= this.getMeeting(meetingName);
+        //remove meeting from all participant schedules
+        for(int i =0; i< tempMeeting.participants.size(); i++) {
+            tempMeeting.participants.get(i).schedule.remove(tempMeeting);
+            log.info("Meeting "+tempMeeting.name+" has been removed from "+tempMeeting.participants.get(i).getName()+ "'s schedule");
+        }
+
+        //add freed time to available
+        this.addAvailableTime(tempMeeting.getMeetingTime());
+        log.info("Freed time added to room "+this.name);
+
+        //remove from meetings
+        this.meetings.remove(tempMeeting);
+        log.info("Freed time added to room "+this.name);
+
+    }
+/*
+    public long getMostCloseStartTimeInMillis(long start, long length){
+        long avstart =0;
+        long avfinish =0;
+
+        for(int i = 0; i< this.availableTime.size(); i++){
+            avstart=this.availableTime.get(i).getStartDate().getTimeInMillis();
+            avfinish=this.availableTime.get(i).getFinishDate().getTimeInMillis();
+
+            if(start>avstart)
+              if(start-avfinish>=length)
+                  return start;
+            else
+                if(avstart-avfinish>=length)
+                    return avstart;
+        }
+        return -1;
+    }
+*/
     public String getName(){
         return name;
     }
@@ -152,7 +196,7 @@ public class Room {
     }
 
     public void printAllMeetings(){
-        if(this.availableTime.size()<1)
+        if(this.meetings.size()<1)
             System.out.println("No meetings planned!");
         else
             System.out.println("Planned meetings:");

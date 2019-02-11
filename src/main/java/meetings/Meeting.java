@@ -9,8 +9,11 @@ public class Meeting{
     MeetingTime meetingTime;
     ArrayList<Participant> participants;
 
-    private static Logger log = Logger.getLogger(Meeting.class.getName());
+    public String getName(){
+        return this.name;
+    }
 
+    private static Logger log = Logger.getLogger(Meeting.class.getName());
 
     public void setName(String name) {
         this.name = name;
@@ -30,7 +33,22 @@ public class Meeting{
         return  this.meetingTime;
     }
 
-    public void printAllParcipants(){
+    //true-added false-user can't be add
+    public boolean addParticipant(Participant tempParticipant){
+        //is free
+        if(!tempParticipant.isBusy(this.meetingTime)){
+            //add to meeting's participants
+            this.participants.add(tempParticipant);
+            log.info("User named "+tempParticipant.getName()+"added to the meeting " );
+            //add to participant's schedule
+            tempParticipant.addMeeting(this);
+            log.info("User named "+tempParticipant.getName()+"got meeting "+this+" is his schedule" );
+        }
+        log.info("User named "+tempParticipant.getName()+" can't be add to the meeting " );
+        return false;
+    }
+
+    public void printAllParticipants(){
         if(this.participants.size()<1)
             System.out.println("No participants!");
         else
@@ -43,6 +61,6 @@ public class Meeting{
 
     public void print(){
         System.out.println("Meeting- "+this.name);
-        this.printAllParcipants();
+        this.printAllParticipants();
     }
 }
