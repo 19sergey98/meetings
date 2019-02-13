@@ -38,7 +38,6 @@ public class Participant {
             for (int i = 0; i < this.schedule.size(); i++)
                 this.schedule.get(i).print();
         }
-
     }
 
     public void addMeeting(Meeting tempMeeting){

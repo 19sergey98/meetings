@@ -174,9 +174,9 @@ public class Room {
         return name;
     }
 
+
     public void print(){
         System.out.println("Room name - "+ this.getName());
-        System.out.println("Available time:");
         this.printAvailableTime();
         System.out.println("Meetings:");
         this.printAllMeetings();
@@ -186,11 +186,11 @@ public class Room {
     public void printAvailableTime(){
         if(this.availableTime.size()<1)
             System.out.println("No available time!");
-        else
+        else{
             System.out.println("Available time:");
-
-        for(int i = 0; i < this.availableTime.size();i++){
-            this.availableTime.get(i).print();
+            for(int i = 0; i < this.availableTime.size();i++){
+                this.availableTime.get(i).print();
+            }
         }
 
     }

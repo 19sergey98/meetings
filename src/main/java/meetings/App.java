@@ -11,12 +11,10 @@ import java.util.logging.Logger;
 public class App {
     //static String datePattern =
     // static SimpleDateFormat ft = new SimpleDateFormat (datePattern);
-
     ArrayList<Room> rooms;
     ArrayList<Participant> participants;
 
     private static Logger log = Logger.getLogger(App.class.getName());
-
 
     public App() {
         rooms = new ArrayList<>();
@@ -49,10 +47,12 @@ public class App {
                 "Show all users",
                 "Add available time for room",
                 "Show planned meetings for the user",
-                "Create new meeting"
+                "Create new meeting",
+                "Show all meetings in room",
+                "Show all meetings"
         };
 
-        while (controller != 10) {
+        while (controller != 20) {
             try {
                 System.out.println();
                 for (int i = 0; i < mainLevelOptions.length; i++)
@@ -157,8 +157,14 @@ public class App {
 
                     case 8:
                         // create new Meeting
+                        tempParticipantsPool.clear();
                         System.out.println("Type meeting name");
                         tempMeetingName = sc.next();
+                        while (mainApp.isMeeting(tempMeetingName)){
+                            System.out.println("There is meeting named "+ tempMeetingName);
+                            System.out.println("Enter different name");
+                            tempMeetingName=sc.next();
+                        }
                         //get meeting len
 
                         tempMeetingLen = mainApp.getMeetingLenFromConsole(sc);
@@ -188,23 +194,66 @@ public class App {
                         System.out.println("Press 1 to get time and place manually");
                         secondController = mainApp.getIntFromConsole(sc);
                         if(secondController==0) {
-                            System.out.println("here we gonna set time by on our own");
+                            log.info("automatic time setting picked");
+                            MeetingTime aaa = mainApp.setMostCloseMeeting(tempParticipantsPool,new GregorianCalendar(),tempMeetingLen, tempMeetingName);
+                            if(aaa!=null){
+                                System.out.println("Meeting has been set to:");
+                                aaa.print();
+                            }
+                            else {
+                                System.out.println("No chance to set meeting in 90 days");
+                            }
                         }
                         else{
-                            System.out.println("yes or no");
+                           tempMeetingParams = mainApp.getMeetingTimeFromConsole(sc);
+                           log.info("manual time setting picked");
+                           //check is busy
+                            //tempMeeting
+                            int ccc = 0;
+                            MeetingTime myTime=new MeetingTime(tempMeetingParams[0],tempMeetingParams[1],tempMeetingParams[2],
+                                    tempMeetingParams[3],tempMeetingParams[4],tempMeetingLen);
+
+                            while (ccc==0){
+                                if(mainApp.areUsersBusy(tempParticipantsPool, myTime)){
+                                    System.out.println("Users are busy in that time");
+                                }
+                                else{
+                                    Room rm = mainApp.getAvailableRoom(myTime);
+                                    if(rm!=null){
+                                        ccc=1;
+                                        //set name and time
+                                        Meeting myMeeting= new Meeting(tempMeetingName,tempMeetingParams[0],tempMeetingParams[1],tempMeetingParams[2],
+                                                tempMeetingParams[3],tempMeetingParams[4],tempMeetingLen);
+                                        //set participants
+                                        myMeeting.addParticipantsList(tempParticipantsPool);
+                                        //add meeting
+                                        rm.addMeeting(myMeeting);
+                                    }
+                                    else {
+                                        System.out.println("No available room");
+                                    }
+                                }
+                            }
                         }
-
-                        /**get meeting time*/
-                        secondController=3;
-
-
-                        //default meeting time
-
                         break; // optional
-
+                    case 9:
+                        // print the room
+                        System.out.println("Type room name");
+                        tempRoomName = sc.next();
+                        if (mainApp.getRoom(tempRoomName) == null) {
+                            System.out.println("There is no room named " + tempRoomName);
+                        } else{
+                            mainApp.printRoom(tempRoomName);
+                        }
+                        break; // optional
                 // You can have any number of case statements.
+                    case 10:
+                        // print all meetings
+                        System.out.println("All meetings:");
+                        mainApp.printAllMeetings();
+                        break; // optional
                     default: // Optional
-                        controller = 10;
+                        controller = 20;
                         // Statements
                 }
             } catch (MeetingInitException e) {
@@ -370,31 +419,78 @@ public class App {
         }
     }
 
-    public void getMostClose(ArrayList<Participant> pool, double lenInHrs){
-         GregorianCalendar today = new GregorianCalendar();
-         long potStartInMillis = today.getTimeInMillis();
-         long rezStartInMillis = potStartInMillis;
-         long lenInMillis = (long)(MeetingTime.oneHour*lenInHrs);
-         long shift = MeetingTime.oneHour/6;
-         long t;
-         int isFilled=0;
-         Room tempRoom;
-         boolean checker=true;
+    public boolean areUsersBusy(ArrayList<Participant> pool, MeetingTime tMeeting){
+        for (int i=0; i<pool.size(); i++){
+            if(pool.get(i).isBusy(tMeeting)){
+                return true;
+            }
+        }
+        return false;
+    }
 
-         for(int i=0; i< this.rooms.size(); i++){
+    public Room getAvailableRoom(MeetingTime tM){
+        for (int i=0; i< this.rooms.size();i++){
+            if(this.rooms.get(i).isTimeAavailable(tM)){
+                log.info("get room"+this.rooms.get(i)+ " for the time" + tM.toString());
+                return this.rooms.get(i);
+                }
+        }
 
-             //does belong
-             for (int j =0; j< pool.size(); j++)
-                 //if(pool.get(j).isBusy(fds"))
-             //if();
-             //if not
-             potStartInMillis+=shift;
+        log.info("no room get for the time" + tM.toString());
+        return null;
+    }
 
+    //meetingTime-set null-no chance to set in 90days
+    public MeetingTime setMostCloseMeeting(ArrayList<Participant> pool, GregorianCalendar startTime, double lenInHrs, String meetingName){
+        GregorianCalendar today = new GregorianCalendar();
+        today=startTime;
+        long potStartInMillis = today.getTimeInMillis();
+        long rezStartInMillis = potStartInMillis;
 
+        long lenInMillis = (long)(MeetingTime.oneHour*lenInHrs);
+        long shift = MeetingTime.oneHour/6;
+        long limit = today.getTimeInMillis() + MeetingTime.oneHour*24*90;
 
-         }
+        Room tempRoom = null;
+        //boolean checker=true;
+        MeetingTime myMT = new MeetingTime(lenInMillis);
 
-         //this.rooms.get(tempRoom).
+        while(myMT.getStartDate().getTimeInMillis()<limit){
+            if(!this.areUsersBusy(pool, myMT)){
+                tempRoom = this.getAvailableRoom(myMT);
+                if(tempRoom!=null)
+                {
+                    Meeting myM = new Meeting(meetingName,myMT);
+                    myM.addParticipantsList(pool);
+                    tempRoom.addMeeting(myM);
+                    return myMT;
+                }
+            }
+            myMT.shiftMeetingTime(shift);
+        }
+         return null;
+    }
+
+    public ArrayList<String> getAllMeetingsNames(){
+        ArrayList<String> tempList = new ArrayList<>();
+        for(int i = 0; i< this.rooms.size(); i++){
+            for(int j = 0; j< this.rooms.get(i).meetings.size(); j++)
+                tempList.add(this.rooms.get(i).meetings.get(j).getName());
+        }
+        return tempList;
+    }
+
+    public boolean isMeeting(String tempName){
+        ArrayList<String> tempList = this.getAllMeetingsNames();
+        for(int i=0; i< tempList.size();i++){
+            if(tempList.get(i).equals(tempName))
+                return true;
+        }
+        return false;
+    }
+
+    public void printRoom(String roomName){
+        this.getRoom(roomName).print();
     }
 
     public void printAllRooms(){
@@ -410,7 +506,7 @@ public class App {
 
     public void printAllMeetings(){
         for(int i = 0; i< this.rooms.size(); i++)
-            for(int j = 0; i< this.rooms.get(i).meetings.size(); j++)
+            for(int j = 0; j< this.rooms.get(i).meetings.size(); j++)
                 this.rooms.get(i).meetings.get(j).print();
     }
     //public static boolean checkValueRange(int )

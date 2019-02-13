@@ -10,7 +10,6 @@ public class MeetingTime {
 
     private static Logger log = Logger.getLogger(MeetingTime.class.getName());
 
-
     public void setStartDate(GregorianCalendar startDate) {
         this.startDate = startDate;
         log.info("Start date set");
@@ -29,6 +28,21 @@ public class MeetingTime {
     public MeetingTime() {
         this.startDate = new GregorianCalendar();
         this.finishDate = new GregorianCalendar();
+    }
+
+    public MeetingTime(long longLen) {
+        this.startDate = new GregorianCalendar();
+        this.finishDate = new GregorianCalendar();
+        this.finishDate.setTimeInMillis(this.startDate.getTimeInMillis()+longLen);
+        log.info("Meeting time "+this+" created today with len"+longLen+" millis");
+
+    }
+
+    public void shiftMeetingTime(long longShift){
+        this.startDate.setTimeInMillis(this.startDate.getTimeInMillis()+longShift);
+        this.finishDate.setTimeInMillis(this.finishDate.getTimeInMillis()+longShift);
+        log.info("Meeting time "+this+" shifted by"+longShift+" millis");
+
     }
 
     /**default meeting length is 1 hour*/
