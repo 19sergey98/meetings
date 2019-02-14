@@ -1,10 +1,11 @@
 package meetings;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 
-public class Room {
+public class Room implements Serializable {
 
     String name;
 
@@ -82,8 +83,16 @@ public class Room {
         return false;
     }
 
-    public void swapAvailableTime(int i, int j)
-    {
+    public boolean isMeeting(String meetingName){
+        for(int i =0; i< this.meetings.size();i++){
+            if(this.meetings.get(i).getName().equals(meetingName))
+                return true;
+        }
+
+        return false;
+    }
+
+    public void swapAvailableTime(int i, int j) {
         MeetingTime tempMT = this.availableTime.get(j);
         this.availableTime.set(j,this.availableTime.get(i));
         this.availableTime.set(i,tempMT);
@@ -134,6 +143,8 @@ public class Room {
 
     }
 
+    //public void removeAvailableTime(MeetingTime timeToRemove)
+
     public void removeMeeting(String meetingName){
         Meeting tempMeeting= this.getMeeting(meetingName);
         //remove meeting from all participant schedules
@@ -151,29 +162,71 @@ public class Room {
         log.info("Freed time added to room "+this.name);
 
     }
-/*
-    public long getMostCloseStartTimeInMillis(long start, long length){
-        long avstart =0;
-        long avfinish =0;
 
-        for(int i = 0; i< this.availableTime.size(); i++){
-            avstart=this.availableTime.get(i).getStartDate().getTimeInMillis();
-            avfinish=this.availableTime.get(i).getFinishDate().getTimeInMillis();
+    public void removeParticipantFromMeeting(String meetingName, String participantName){
+        Meeting tmpMeeting= this.getMeeting(meetingName);
+        Participant tmpParticipant = tmpMeeting.getParticipant(participantName);
 
-            if(start>avstart)
-              if(start-avfinish>=length)
-                  return start;
-            else
-                if(avstart-avfinish>=length)
-                    return avstart;
+        if(tmpMeeting==null)
+            log.info("Tried to remove from not existed meeting named "+meetingName);
+        else {
+            if (tmpParticipant != null){
+                //adjust schedule
+                tmpParticipant.removeMeeting(tmpMeeting);
+                //adjust meeting participants
+                tmpMeeting.removeParticipant(participantName);
+                log.info("removed user "+participantName);
+            }
+            else{
+                log.info("Tried to remove not existed user named "+participantName+" from room named "+meetingName);
+            }
         }
-        return -1;
     }
-*/
+
+    public void addParticipantToMeeting(String meetingName, Participant participant) {
+        Meeting tmpMeeting = this.getMeeting(meetingName);
+
+        if (tmpMeeting == null)
+            log.info("Tried to add new user to not existed meeting named" + meetingName);
+        else {
+            if (tmpMeeting.isParticipant(participant.getName())) {
+                log.info("Tried to add user but there is one named" + participant.getName());
+            } else {
+                if (!participant.isBusy(tmpMeeting.getMeetingTime())) {
+                    tmpMeeting.addParticipant(participant);
+                    log.info("Add user" + participant.getName() + " to meeting " + meetingName);
+                }
+                else
+                    log.info("User" + participant.getName() + "is busy for the meeting " + meetingName);
+            }
+        }
+    }
+
+    public boolean changeMeetingDate(String meetingName, int year, int month, int date, int hour, int minute){
+
+        for(int i = 0; i< this.meetings.size(); i++)
+            if(this.meetings.get(i).getName().equals(meetingName)){//there is such meeting
+
+                Meeting tempMeeting = this.meetings.remove(i);
+                this.addAvailableTime(tempMeeting.getMeetingTime());
+                MeetingTime myMT = new MeetingTime( year,  month,  date,  hour,  minute,tempMeeting.meetingTime.getLength());
+                if(this.isTimeAavailable(myMT)){//can change
+                    tempMeeting.changeDate(myMT);
+                    log.info("Time has changed");
+                }
+                else {//can't
+                log.info("No time for change");
+                }
+                this.addMeeting(tempMeeting);
+                i=this.meetings.size();
+                return true;
+            }
+        return false;
+    }
+
     public String getName(){
         return name;
     }
-
 
     public void print(){
         System.out.println("Room name - "+ this.getName());

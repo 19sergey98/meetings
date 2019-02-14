@@ -1,14 +1,13 @@
 package meetings;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-public class App {
+public class App implements Serializable{
     //static String datePattern =
     // static SimpleDateFormat ft = new SimpleDateFormat (datePattern);
     ArrayList<Room> rooms;
@@ -49,7 +48,14 @@ public class App {
                 "Show planned meetings for the user",
                 "Create new meeting",
                 "Show all meetings in room",
-                "Show all meetings"
+                "Show all meetings",
+                "Remove the meeting",
+                "Add participant to the meeting",
+                "Remove participant from the meeting",
+                "Change meeting date",
+                "Save session",
+                "Load session",
+                "Exit"
         };
 
         while (controller != 20) {
@@ -252,73 +258,150 @@ public class App {
                         System.out.println("All meetings:");
                         mainApp.printAllMeetings();
                         break; // optional
+                    case 11:
+                        // remove the meeting
+                        System.out.println("Type meeting name:");
+                        tempMeetingName = sc.next();
+                        if(mainApp.isMeeting(tempMeetingName)){
+                            mainApp.removeMeeting(tempMeetingName);
+                        }
+                        else {
+                            System.out.println("There is no meeting named "+tempMeetingName);
+                            log.info("Tried to remove not existed meeting "+tempMeetingName);
+                        }
+                        break; // optional
+
+                    case 12:
+                        // add user to meeting
+                        System.out.println("Type user name");
+                        tempUserName = sc.next();
+                        if(mainApp.getParticipant(tempUserName)==null)
+                            mainApp.addUser(tempUserName);
+
+                        System.out.println("Type meeting name");
+                        tempMeetingName = sc.next();
+                        while (!mainApp.isMeeting(tempMeetingName)){
+                            System.out.println("There is no meeting named" + tempMeetingName);
+                            System.out.println("Type meeting name");
+                            tempMeetingName = sc.next();
+                        }
+                        Room tempRoom = mainApp.getRoomWithMeeting(tempMeetingName);
+                        Participant tempParticipant = mainApp.getParticipant(tempUserName);
+
+                        if(tempParticipant.isBusy(tempRoom.getMeeting(tempMeetingName).getMeetingTime()))
+                            System.out.println("User not available that time");
+                        else
+                            tempRoom.addParticipantToMeeting(tempMeetingName,tempParticipant);
+
+                        break; // optional
+
+                    case 13:
+                        // remove participant from meeting
+                        System.out.println("Type user name");
+                        tempUserName = sc.next();
+                        if(mainApp.getParticipant(tempUserName)==null)
+                            mainApp.addUser(tempUserName);
+
+                        System.out.println("Type meeting name");
+                        tempMeetingName = sc.next();
+                        while (!mainApp.isMeeting(tempMeetingName)){
+                            System.out.println("There is no meeting named" + tempMeetingName);
+                            System.out.println("Type meeting name");
+                            tempMeetingName = sc.next();
+                        }
+                        Room tRoom = mainApp.getRoomWithMeeting(tempMeetingName);
+                        Meeting tMeeting = tRoom.getMeeting(tempMeetingName);
+
+                        if(tMeeting!=null) {
+                            tRoom.removeParticipantFromMeeting(tempMeetingName,tempUserName);
+                            //tempMeeting.removeParticipant(tempUserName);
+                        }
+                        else
+                            System.out.println("no meeting in room");
+                        break;
+
+                    case 14:
+                        // change date
+                        System.out.println("Type meeting name");
+                        tempMeetingName = sc.next();
+                        while (!mainApp.isMeeting(tempMeetingName)){
+                            System.out.println("There is no meeting named" + tempMeetingName);
+                            System.out.println("Type meeting name");
+                            tempMeetingName = sc.next();
+                        }
+                        Room ttRoom = mainApp.getRoomWithMeeting(tempMeetingName);
+
+                        tempMeetingParams=mainApp.getMeetingTimeFromConsole(sc);
+                        if(ttRoom.changeMeetingDate(tempMeetingName,tempMeetingParams[0],
+                                tempMeetingParams[1],tempMeetingParams[2],tempMeetingParams[3],tempMeetingParams[4])) {
+                            System.out.println("Date changed");
+                        }
+                        else
+                            System.out.println("Date can't be changed");
+
+
+                        break; // optional
+
+                    case 15:
+                        //save session
+                        System.out.println("Press 0 to save to default file named session.out ");
+                        System.out.println("Press 1 to save to your own file ");
+
+                        int cc = mainApp.getIntFromConsole(sc);
+                        if(cc==0){
+                            mainApp.saveObject("session.out");
+                        }
+                        else {
+                            System.out.println("Type file name");
+                            mainApp.saveObject(sc.next());
+                        }
+
+                        break;
+
+                    case 16:
+                        //load session
+                        System.out.println("Press 0 to load from default file named session.out ");
+                        System.out.println("Press 1 to load from your own file ");
+                        if(mainApp.getIntFromConsole(sc)==0){
+                            mainApp = mainApp.loadObject("session.out");
+                        }
+                        else {
+                            System.out.println("Type file name");
+                            mainApp = mainApp.loadObject(sc.next());
+                        }
+                        break;
+
                     default: // Optional
                         controller = 20;
                         // Statements
                 }
-            } catch (MeetingInitException e) {
+
+            }
+            catch (ClassNotFoundException e){
+                System.out.println("Error while file loading object");
+            }
+            catch (IOException e) {
+                //  Block of code to handle errors
+                System.out.println("Error while writing to file");
+                e.printStackTrace();
+
+            }
+            catch (InputMismatchException e) {
+                //  Block of code to handle errors
+                System.out.println("Incorrect data format");
+
+            }catch (MeetingInitException e) {
                 //  Block of code to handle errors
                 e.printStackTrace();
             }/*catch (ParseException e) {
             System.out.println("Unparseable using " + ft);
-        }*/ catch (InputMismatchException e) {
-                //  Block of code to handle errors
-                System.out.println("Incorrect data format");
-                //sc.close();
-                //sc = new Scanner(System.in);
-                //e.printStackTrace();
-            } finally {
+        }*/
+
+            finally {
                 //System.out.println("The 'try catch' is finished.");
             }
         }
     }
-    //adding test
-            /*
-            MeetingTime testMeetingTime =new MeetingTime(2018,11,4,6,0,1.5);
-            Room testRoom= new Room(1);
-            testRoom.addAvailableTime(testMeetingTime);
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addAvailableTime(new MeetingTime(2018,11,4,9,0,1.5));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addAvailableTime(new MeetingTime(2018,11,4,10,0,1));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addAvailableTime(new MeetingTime(2018,11,4,12,0,1));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addAvailableTime(new MeetingTime(2018,11,4,6,0,1));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addAvailableTime(new MeetingTime(2018,11,4,6,0,5.5));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addAvailableTime(new MeetingTime(2018,11,4,11,0,3));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addMeeting(new Meeting(2018,11,4,13,0,1));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addMeeting(new Meeting(2018,11,4,8,0,1));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addMeeting(new Meeting(2018,11,4,6,0,1));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addMeeting(new Meeting(2018,11,4,7,0,1));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addMeeting(new Meeting(2018,11,4,10,0,1));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addMeeting(new Meeting(2018,11,4,11,0,1));
-            testRoom.printAvailableTime();
-            System.out.println();
-            testRoom.addAvailableTime(new MeetingTime(2018,11,4,15,0,1));
-            testRoom.printAvailableTime();
-               */
-
 
     //System.out.println( "Hello World!" );
     public int[] getMeetingTimeFromConsole(Scanner myc){
@@ -388,6 +471,13 @@ public class App {
         return null;
     }
 
+    public Room getRoomWithMeeting(String meetingName){
+        for (int i = 0; i < this.rooms.size(); i++)
+            if (this.rooms.get(i).isMeeting(meetingName))
+                return this.rooms.get(i);
+        return null;
+    }
+
     public void removeRoom(String roomName) {
         if (getRoom(roomName) != null){
             rooms.remove(getRoom(roomName));
@@ -440,6 +530,14 @@ public class App {
         return null;
     }
 
+    public void removeMeeting(String mName){
+        Room tRoom=this.getRoomWithMeeting(mName);
+        if(tRoom!=null) {
+            tRoom.removeMeeting(mName);
+            log.info("removed meeting " + mName + " ");
+        }
+    }
+
     //meetingTime-set null-no chance to set in 90days
     public MeetingTime setMostCloseMeeting(ArrayList<Participant> pool, GregorianCalendar startTime, double lenInHrs, String meetingName){
         GregorianCalendar today = new GregorianCalendar();
@@ -489,11 +587,30 @@ public class App {
         return false;
     }
 
+    public void saveObject(String fileName) throws IOException {
+        FileOutputStream fos = new FileOutputStream(fileName);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(this);
+        oos.flush();
+        oos.close();
+
+    }
+
+    public App loadObject(String fileName) throws IOException, ClassNotFoundException {
+        FileInputStream fis = new FileInputStream(fileName);
+        ObjectInputStream oin = new ObjectInputStream(fis);
+        return (App) oin.readObject();
+    }
+
+
     public void printRoom(String roomName){
         this.getRoom(roomName).print();
     }
 
     public void printAllRooms(){
+        if(this.rooms.size()<1)
+            System.out.println("No rooms yet");
+
         for(int i = 0; i< this.rooms.size(); i++)
             this.rooms.get(i).print();
     }
@@ -503,13 +620,10 @@ public class App {
             this.participants.get(i).print();
     }
 
-
     public void printAllMeetings(){
         for(int i = 0; i< this.rooms.size(); i++)
             for(int j = 0; j< this.rooms.get(i).meetings.size(); j++)
                 this.rooms.get(i).meetings.get(j).print();
     }
-    //public static boolean checkValueRange(int )
-
 
 }

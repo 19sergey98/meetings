@@ -1,9 +1,11 @@
 package meetings;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 
-public class Meeting{
+public class Meeting implements Serializable {
 
     String name;
     MeetingTime meetingTime;
@@ -46,6 +48,69 @@ public class Meeting{
     public MeetingTime getMeetingTime() {
         return  this.meetingTime;
     }
+
+    public boolean isParticipant(String participantName){
+        for(int i=0; i< this.participants.size();i++)
+            if(this.participants.get(i).getName().equals(participantName))
+                return true;
+        return false;
+    }
+
+    public void removeParticipant(String participantName){
+        Participant tempParticipant = this.getParticipant(participantName);
+
+        if(tempParticipant==null){
+            log.info("tried to remove not existed participant named + "+participantName+" from meeting"+this);
+        }
+        else {
+            //remove from schedule
+            this.getParticipant(participantName).removeMeeting(this);
+            //remove from participants
+            this.participants.remove(this.getParticipant(participantName));
+            log.info("removed participant");
+        }
+    }
+
+    public Participant getParticipant(String participantName) {
+        for (int i = 0; i < this.participants.size(); i++) {
+            if (this.participants.get(i).getName().equals(participantName))
+                return this.participants.get(i);
+        }
+        return null;
+    }
+
+    public void changeDate(int year, int month, int date, int hour, int minute){
+        long len = this.meetingTime.getLengthInMillis();
+        GregorianCalendar newStartDate = new GregorianCalendar( year,  month,  date,  hour,  minute);
+        GregorianCalendar newFinishDate = new GregorianCalendar( year,  month,  date,  hour,  minute);
+        newFinishDate.setTimeInMillis(newStartDate.getTimeInMillis()+len);
+        this.meetingTime.setStartDate(newStartDate);
+        log.info("set new start date "+newStartDate.toString()+"for "+this);
+        this.meetingTime.setFinishDate(newFinishDate);
+        log.info("set new finish date "+newFinishDate.toString()+"for "+this);
+    }
+
+    public void changeDate(MeetingTime newMeetingTime){
+        GregorianCalendar newStartDate = new GregorianCalendar();
+        newStartDate.setTimeInMillis(newMeetingTime.getStartDate().getTimeInMillis());
+
+        GregorianCalendar newFinishDate = new GregorianCalendar();
+        newFinishDate.setTimeInMillis(newMeetingTime.getFinishDate().getTimeInMillis());
+
+        this.meetingTime.setStartDate(newStartDate);
+        log.info("set new start date "+newStartDate.toString()+"for "+this);
+
+        this.meetingTime.setFinishDate(newFinishDate);
+        log.info("set new finish date "+newFinishDate.toString()+"for "+this);
+    }
+
+    /*public Meeting getCopy(){
+        Meeting tempMeeting=new Meeting(this.getName(), this.getMeetingTime());
+         Participant tempUser;
+        for(int i=0; i<this.participants.size(); i++){
+            tempUser=new Participant(this.participants.)
+        }
+    }*/
 
     //true-added false-user can't be add
     public boolean addParticipant(Participant tempParticipant){

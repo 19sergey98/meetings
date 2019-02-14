@@ -1,9 +1,10 @@
 package meetings;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-public class Participant {
+public class Participant implements Serializable {
 
     String name;
 
@@ -43,6 +44,11 @@ public class Participant {
     public void addMeeting(Meeting tempMeeting){
         this.schedule.add(tempMeeting);
         log.info("Meeting "+tempMeeting.name+" add to user named "+this.name+" schedule");
+    }
+
+    public void removeMeeting(Meeting tempMeeting){
+        this.schedule.remove(tempMeeting);
+        log.info("Meeting "+tempMeeting.name+" removed from user named "+this.name+" schedule");
     }
 
     public ArrayList<MeetingTime> getBusyTime(){

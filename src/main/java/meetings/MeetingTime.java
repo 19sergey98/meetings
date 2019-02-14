@@ -1,10 +1,11 @@
 package meetings;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 
-public class MeetingTime {
+public class MeetingTime implements Serializable {
 
     GregorianCalendar startDate;
 
