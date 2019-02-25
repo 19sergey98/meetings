@@ -53,17 +53,7 @@ public class Room implements Serializable {
                 i--;
             }
             log.info("Added available time for room "+this.name+" "+ this);
-
         }
-
-
-       /* if (this.availableTime.size() < 1) {
-            this.availableTime.add(timeToAdd);
-        }*/
-
-
-        //check nearby intervals
-
     }
 
     public boolean isTimeAavailable(MeetingTime timeToCheck){
@@ -115,7 +105,6 @@ public class Room implements Serializable {
                 //add to meeting list
                 this.meetings.add(tempMeeting);
                 //adjust available time
-
                 long tempFinishTimeInMillis = this.availableTime.get(i).getFinishDate().getTimeInMillis();
                 long tempStartTimeInMillis = tempMeeting.getMeetingTime().getFinishDate().getTimeInMillis();
 
@@ -143,8 +132,6 @@ public class Room implements Serializable {
 
     }
 
-    //public void removeAvailableTime(MeetingTime timeToRemove)
-
     public void removeMeeting(String meetingName){
         Meeting tempMeeting= this.getMeeting(meetingName);
         //remove meeting from all participant schedules
@@ -160,7 +147,6 @@ public class Room implements Serializable {
         //remove from meetings
         this.meetings.remove(tempMeeting);
         log.info("Freed time added to room "+this.name);
-
     }
 
     public void removeParticipantFromMeeting(String meetingName, String participantName){
@@ -203,7 +189,6 @@ public class Room implements Serializable {
     }
 
     public boolean changeMeetingDate(String meetingName, int year, int month, int date, int hour, int minute){
-
         for(int i = 0; i< this.meetings.size(); i++)
             if(this.meetings.get(i).getName().equals(meetingName)){//there is such meeting
 

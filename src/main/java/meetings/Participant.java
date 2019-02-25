@@ -15,7 +15,7 @@ public class Participant implements Serializable {
     public Participant(String name) {
         schedule = new ArrayList<>();
         this.name = name;
-        log.info("Participant created "+this);
+        log.info("Participant created " + this);
     }
 
     public String getName() {
@@ -24,36 +24,36 @@ public class Participant implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-        log.info("name  set for " +this);
+        log.info("name  set for " + this);
     }
 
-    public void print(){
-        System.out.println("User - "+this.name);
+    public void print() {
+        System.out.println("User - " + this.name);
     }
 
-    public void printSchedule(){
-        if(this.schedule.size()<1)
+    public void printSchedule() {
+        if (this.schedule.size() < 1)
             System.out.println("there is no meetings planed for " + this.name);
-        else{
+        else {
             System.out.println("meetings planed for " + this.name);
             for (int i = 0; i < this.schedule.size(); i++)
                 this.schedule.get(i).print();
         }
     }
 
-    public void addMeeting(Meeting tempMeeting){
+    public void addMeeting(Meeting tempMeeting) {
         this.schedule.add(tempMeeting);
-        log.info("Meeting "+tempMeeting.name+" add to user named "+this.name+" schedule");
+        log.info("Meeting " + tempMeeting.name + " add to user named " + this.name + " schedule");
     }
 
-    public void removeMeeting(Meeting tempMeeting){
+    public void removeMeeting(Meeting tempMeeting) {
         this.schedule.remove(tempMeeting);
-        log.info("Meeting "+tempMeeting.name+" removed from user named "+this.name+" schedule");
+        log.info("Meeting " + tempMeeting.name + " removed from user named " + this.name + " schedule");
     }
 
-    public ArrayList<MeetingTime> getBusyTime(){
+    public ArrayList<MeetingTime> getBusyTime() {
         ArrayList<MeetingTime> tempMT = new ArrayList<>();
-        for(int i=0; i< this.schedule.size(); i++) {
+        for (int i = 0; i < this.schedule.size(); i++) {
             tempMT.add(schedule.get(i).meetingTime);
         }
 
@@ -61,29 +61,29 @@ public class Participant implements Serializable {
     }
 
     //check!!!
-    public boolean isBusy(MeetingTime potMeetingTime){
+    public boolean isBusy(MeetingTime potMeetingTime) {
         ArrayList<MeetingTime> tempMT = new ArrayList<>();
-        log.info("Run busy-ness check for user "+this.name+" for time "+potMeetingTime);
-        for(int i=0; i< this.schedule.size(); i++) {
-            if(
+        log.info("Run busy-ness check for user " + this.name + " for time " + potMeetingTime);
+        for (int i = 0; i < this.schedule.size(); i++) {
+            if (
                     (
-                    potMeetingTime.getStartDate().getTimeInMillis()<this.schedule.get(i).getMeetingTime().getFinishDate().getTimeInMillis()
-                    &&
-                    potMeetingTime.getStartDate().getTimeInMillis()>this.schedule.get(i).getMeetingTime().getStartDate().getTimeInMillis()
+                            potMeetingTime.getStartDate().getTimeInMillis() < this.schedule.get(i).getMeetingTime().getFinishDate().getTimeInMillis()
+                                    &&
+                                    potMeetingTime.getStartDate().getTimeInMillis() > this.schedule.get(i).getMeetingTime().getStartDate().getTimeInMillis()
                     )
-                    ||
+                            ||
                             (
-                                    potMeetingTime.getFinishDate().getTimeInMillis()<this.schedule.get(i).getMeetingTime().getFinishDate().getTimeInMillis()
+                                    potMeetingTime.getFinishDate().getTimeInMillis() < this.schedule.get(i).getMeetingTime().getFinishDate().getTimeInMillis()
                                             &&
-                                            potMeetingTime.getFinishDate().getTimeInMillis()>this.schedule.get(i).getMeetingTime().getStartDate().getTimeInMillis()
+                                            potMeetingTime.getFinishDate().getTimeInMillis() > this.schedule.get(i).getMeetingTime().getStartDate().getTimeInMillis()
                             )
 
-            ){
-                log.info("Busy-ness check for user "+this.name+" is true ");
+            ) {
+                log.info("Busy-ness check for user " + this.name + " is true ");
                 return true;
             }
         }
-        log.info("Busy-ness check for user "+this.name+" is false ");
+        log.info("Busy-ness check for user " + this.name + " is false ");
         return false;
     }
 

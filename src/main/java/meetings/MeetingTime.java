@@ -21,10 +21,9 @@ public class MeetingTime implements Serializable {
     public void setFinishDate(GregorianCalendar finishDate) {
         this.finishDate = finishDate;
         log.info("Finish date set");
-
     }
 
-    static long oneHour = 60*60*1000L;
+    static long oneHour = 60 * 60 * 1000L;
 
     public MeetingTime() {
         this.startDate = new GregorianCalendar();
@@ -34,62 +33,60 @@ public class MeetingTime implements Serializable {
     public MeetingTime(long longLen) {
         this.startDate = new GregorianCalendar();
         this.finishDate = new GregorianCalendar();
-        this.finishDate.setTimeInMillis(this.startDate.getTimeInMillis()+longLen);
-        log.info("Meeting time "+this+" created today with len"+longLen+" millis");
-
+        this.finishDate.setTimeInMillis(this.startDate.getTimeInMillis() + longLen);
+        log.info("Meeting time " + this + " created today with len" + longLen + " millis");
     }
 
-    public void shiftMeetingTime(long longShift){
-        this.startDate.setTimeInMillis(this.startDate.getTimeInMillis()+longShift);
-        this.finishDate.setTimeInMillis(this.finishDate.getTimeInMillis()+longShift);
-        log.info("Meeting time "+this+" shifted by"+longShift+" millis");
-
+    public void shiftMeetingTime(long longShift) {
+        this.startDate.setTimeInMillis(this.startDate.getTimeInMillis() + longShift);
+        this.finishDate.setTimeInMillis(this.finishDate.getTimeInMillis() + longShift);
+        log.info("Meeting time " + this + " shifted by" + longShift + " millis");
     }
 
-    /**default meeting length is 1 hour*/
+    /**
+     * default meeting length is 1 hour
+     */
     public MeetingTime(int year, int month, int date, int hour, int minute) {
         this.startDate = new GregorianCalendar(year, month, date, hour, minute);
         long original = startDate.getTimeInMillis();
         this.finishDate = new GregorianCalendar(year, month, date, hour, minute);
-        finishDate.setTimeInMillis(original+MeetingTime.oneHour);
+        finishDate.setTimeInMillis(original + MeetingTime.oneHour);
     }
 
     public MeetingTime(int year, int month, int date, int hour, int minute, double meetingLen) {
-        if(meetingLen<=0)
+        if (meetingLen <= 0)
             throw new MeetingInitException("Incorrect meeting time. Gotta be more than 0");
 
         this.startDate = new GregorianCalendar(year, month, date, hour, minute);
         this.finishDate = new GregorianCalendar(year, month, date, hour, minute);
         long original = startDate.getTimeInMillis();
-        finishDate.setTimeInMillis(original+(long)(MeetingTime.oneHour*meetingLen));
+        finishDate.setTimeInMillis(original + (long) (MeetingTime.oneHour * meetingLen));
 
-        log.info("Meeting time created "+this);
-
+        log.info("Meeting time created " + this);
     }
 
-    public long getLengthInMillis(){
+    public long getLengthInMillis() {
         long begin = startDate.getTimeInMillis();
         long end = finishDate.getTimeInMillis();
-        return end-begin;
+        return end - begin;
     }
 
-    public double getLength(){
+    public double getLength() {
         float tm = this.getLengthInMillis();
-        return tm/MeetingTime.oneHour;
+        return tm / MeetingTime.oneHour;
     }
 
-    public GregorianCalendar getStartDate(){
+    public GregorianCalendar getStartDate() {
         return startDate;
     }
 
-    public GregorianCalendar getFinishDate(){
+    public GregorianCalendar getFinishDate() {
         return finishDate;
     }
 
-    public void print()
-    {
-        System.out.println("Start Date: "+startDate.getTime());
-        System.out.println("Finish Date: "+finishDate.getTime());
+    public void print() {
+        System.out.println("Start Date: " + startDate.getTime());
+        System.out.println("Finish Date: " + finishDate.getTime());
     }
 }
 

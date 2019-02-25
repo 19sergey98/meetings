@@ -34,10 +34,6 @@ public class Meeting implements Serializable {
         log.info("Created meeting  "+name+" " );
     }
 
-    /*public void Shift(long longLen){
-
-    }*/
-
     public Meeting(String name, MeetingTime mt){
         this.meetingTime = mt;
         this.participants = new ArrayList<>();
@@ -104,14 +100,6 @@ public class Meeting implements Serializable {
         log.info("set new finish date "+newFinishDate.toString()+"for "+this);
     }
 
-    /*public Meeting getCopy(){
-        Meeting tempMeeting=new Meeting(this.getName(), this.getMeetingTime());
-         Participant tempUser;
-        for(int i=0; i<this.participants.size(); i++){
-            tempUser=new Participant(this.participants.)
-        }
-    }*/
-
     //true-added false-user can't be add
     public boolean addParticipant(Participant tempParticipant){
         //is free
@@ -133,15 +121,17 @@ public class Meeting implements Serializable {
             this.addParticipant(tempList.get(i));
     }
 
-    public void printAllParticipants(){
-        if(this.participants.size()<1)
+    public void printAllParticipants() {
+        if (this.participants.size() < 1)
             System.out.println("No participants!");
         else
-            System.out.println("Participants :");{
+            System.out.println("Participants :");
+        {
 
-                for(int i = 0; i < this.participants.size();i++){
-                    System.out.println(this.participants.get(i).getName());
-        }}
+            for (int i = 0; i < this.participants.size(); i++) {
+                System.out.println(this.participants.get(i).getName());
+            }
+        }
     }
 
     public void print(){
