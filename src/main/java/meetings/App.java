@@ -52,6 +52,10 @@ public class App implements Serializable {
                 "Exit"
         };
 
+        String[] enterLevelOption= {"Press 0 to cancel",
+                "Press any other number to carry on"
+        };
+
         while (controller != 20) {
             try {
                 System.out.println();
@@ -61,8 +65,17 @@ public class App implements Serializable {
                     sc.next();
                     System.out.println("Enter correct number");
                 }
+                //check sure part
                 controller = sc.nextInt();
-
+                if(controller<18 && controller>=0){
+                    System.out.println("Get in "+mainLevelOptions[controller]+" lobby?");
+                    System.out.println("    0 - No");
+                    System.out.println("    Any other num - Yes");
+                    secondController = mainApp.getIntFromConsole(sc);
+                }
+                if(secondController==0){
+                    controller=19;
+                }
 
                 switch (controller) {
                     case 0:
@@ -77,6 +90,7 @@ public class App implements Serializable {
                         break;
                     case 1:
                         // remove the room
+
                         System.out.println("Type room name");
                         tempRoomName = sc.next();
                         if (mainApp.getRoom(tempRoomName) == null) {
@@ -205,6 +219,7 @@ public class App implements Serializable {
                             while (ccc == 0) {
                                 if (mainApp.areUsersBusy(tempParticipantsPool, myTime)) {
                                     System.out.println("Users are busy in that time");
+                                    System.out.println("TRY DIFFERENT ONE");
                                     tempMeetingParams = mainApp.getMeetingTimeFromConsole(sc);
                                     myTime = new MeetingTime(tempMeetingParams[0], tempMeetingParams[1], tempMeetingParams[2],
                                             tempMeetingParams[3], tempMeetingParams[4], tempMeetingLen);
@@ -222,6 +237,7 @@ public class App implements Serializable {
                                         rm.addMeeting(myMeeting);
                                     } else {
                                         System.out.println("No available room");
+                                        System.out.println("TRY DIFFERENT ONE");
                                         tempMeetingParams = mainApp.getMeetingTimeFromConsole(sc);
                                         myTime = new MeetingTime(tempMeetingParams[0], tempMeetingParams[1], tempMeetingParams[2],
                                                 tempMeetingParams[3], tempMeetingParams[4], tempMeetingLen);
@@ -346,9 +362,11 @@ public class App implements Serializable {
                             mainApp = mainApp.loadObject(sc.next());
                         }
                         break;
-
-                    default:
+                    case 17:
                         controller = 20;//set to exit value
+                        break;
+                    default:
+                        break;
                 }
 
             } catch (ClassNotFoundException e) {
