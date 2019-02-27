@@ -14,6 +14,20 @@ public class Room implements Serializable {
 
     private static Logger log = Logger.getLogger(Room.class.getName());
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Room r = (Room) o;
+        return this.name.equals(r.name);
+    }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "name=" + this.name + '}';
+    }
+
     public Room(int id) {
         this.name = "room"+id;
         this.availableTime = new ArrayList<MeetingTime>();
@@ -193,7 +207,14 @@ public class Room implements Serializable {
             if(this.meetings.get(i).getName().equals(meetingName)){//there is such meeting
 
                 Meeting tempMeeting = this.meetings.remove(i);
-                this.addAvailableTime(tempMeeting.getMeetingTime());
+                tempMeeting.changeDate(tempMeeting.meetingTime);//fix time issues caused link
+
+                MeetingTime timeToAdd= new MeetingTime();
+                timeToAdd.getStartDate().setTimeInMillis(tempMeeting.getMeetingTime().getStartDate().getTimeInMillis());
+                timeToAdd.getFinishDate().setTimeInMillis(tempMeeting.getMeetingTime().getFinishDate().getTimeInMillis());
+
+                this.addAvailableTime(timeToAdd);
+
                 MeetingTime myMT = new MeetingTime( year,  month,  date,  hour,  minute,tempMeeting.meetingTime.getLength());
                 if(this.isTimeAavailable(myMT)){//can change
                     tempMeeting.changeDate(myMT);

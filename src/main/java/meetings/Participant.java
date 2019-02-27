@@ -12,6 +12,18 @@ public class Participant implements Serializable {
 
     private static Logger log = Logger.getLogger(Participant.class.getName());
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Participant par = (Participant) o;
+        return this.name.equals(par.getName());
+    }
+    @Override
+    public String toString() {
+        return "Participant{" +
+                "name=" + this.name + '}';
+    }
     public Participant(String name) {
         schedule = new ArrayList<>();
         this.name = name;

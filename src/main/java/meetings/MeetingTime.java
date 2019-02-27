@@ -25,6 +25,20 @@ public class MeetingTime implements Serializable {
 
     static long oneHour = 60 * 60 * 1000L;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MeetingTime mt = (MeetingTime) o;
+        return this.startDate.equals(mt.getStartDate()) && this.finishDate.equals(mt.getFinishDate());
+    }
+
+    @Override
+    public String toString() {
+        return "Meeting time{" +
+                "start: " + this.startDate.getTime() +" finish: "+this.finishDate.getTime()+ '}';
+    }
+
     public MeetingTime() {
         this.startDate = new GregorianCalendar();
         this.finishDate = new GregorianCalendar();

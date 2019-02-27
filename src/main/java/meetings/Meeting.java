@@ -11,6 +11,21 @@ public class Meeting implements Serializable {
     MeetingTime meetingTime;
     ArrayList<Participant> participants;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Meeting m = (Meeting) o;
+        return this.meetingTime.equals(m.meetingTime) &&
+                this.name.equals(m.name);
+    }
+
+    @Override
+    public String toString() {
+        return "Meeting{" +
+                "name=" + this.name + '}';
+    }
+
     public String getName(){
         return this.name;
     }

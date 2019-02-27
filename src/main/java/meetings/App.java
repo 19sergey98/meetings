@@ -389,6 +389,14 @@ public class App implements Serializable {
         }
     }
 
+    public ArrayList<Participant> getAllUsers(){
+        return this.participants;
+    }
+
+    public ArrayList<Room> getAllRooms(){
+        return this.rooms;
+    }
+
     public int[] getMeetingTimeFromConsole(Scanner myc) {
         int[] tempRez = {2019, 2, 18, 10, 0};
         System.out.println("Meeting time :");
