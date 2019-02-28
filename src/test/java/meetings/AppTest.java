@@ -159,6 +159,139 @@ public class AppTest
         Assert.assertEquals(testApp.getRoom("ua").availableTime,testList);
     }
 
+    @Test
+    public void addMeeting(){
+        App testApp = new App();
 
+        testApp.addRoom("ua");
+        //set av time
+        testApp.getRoom("ua").addAvailableTime(new MeetingTime(2019,10,2,11,0,3));
+
+        //add meeting to not available time
+        testApp.getRoom("ua").addMeeting(new Meeting("test",new MeetingTime(2019,10,2,8,0,4)));
+        Assert.assertEquals(testApp.getRoom("ua").meetings,new ArrayList<Meeting>());
+
+        //add meeting
+        testApp.getRoom("ua").addMeeting(new Meeting("test",new MeetingTime(2019,10,2,11,0,1)));
+
+        ArrayList<Meeting> testList = new ArrayList<>();
+        testList.add(new Meeting("test",new MeetingTime(2019,10,2,11,0,1)));
+
+        Assert.assertEquals(testApp.getRoom("ua").meetings,testList);
+        //try to add to not available time. Result gotta stay the same
+        testApp.getRoom("ua").addMeeting(new Meeting("test",new MeetingTime(2019,10,2,11,0,1)));
+        //final check
+        Assert.assertEquals(testApp.getRoom("ua").meetings,testList);
+    }
+
+    @Test
+    public void removeMeeting(){
+        App testApp = new App();
+
+        testApp.addRoom("ua");
+
+        testApp.getRoom("ua").addAvailableTime(new MeetingTime(2019,10,2,11,0,3));
+
+        //add meetings
+        testApp.getRoom("ua").addMeeting(new Meeting("test",new MeetingTime(2019,10,2,11,0,1)));
+        testApp.getRoom("ua").addMeeting(new Meeting("test2",new MeetingTime(2019,10,2,12,0,1)));
+
+        ArrayList<Meeting> testList = new ArrayList<>();
+        testList.add(new Meeting("test",new MeetingTime(2019,10,2,11,0,1)));
+        testApp.removeMeeting("test2");
+
+        //check meetings
+        Assert.assertEquals(testApp.getRoom("ua").meetings,testList);
+
+        testApp.removeMeeting("test");
+
+        //check is empty
+        Assert.assertEquals(testApp.getRoom("ua").meetings,new ArrayList<Meeting>());
+
+    }
+
+    @Test
+    public void addParticipantToMeeting(){
+        App testApp = new App();
+
+        testApp.addRoom("r");
+
+        testApp.getRoom("r").addAvailableTime(new MeetingTime(2019,10,2,11,0,3));
+
+        //add meetings
+        testApp.getRoom("r").addMeeting(new Meeting("test",new MeetingTime(2019,10,2,11,0,1)));
+        //create users
+        testApp.addUser("ua");
+        testApp.addUser("ub");
+
+        //add participant
+        testApp.getRoom("r").addParticipantToMeeting("test",testApp.getParticipant("ua"));
+        testApp.getRoom("r").addParticipantToMeeting("test",testApp.getParticipant("ub"));
+
+        ArrayList<Participant> testParticipantList = new ArrayList<>();
+        testParticipantList.add(new Participant("ua"));
+        testParticipantList.add(new Participant("ub"));
+        //check are ua and ub in test meeting
+        Assert.assertEquals(testApp.getRoom("r").getMeeting("test").participants,testParticipantList);
+    }
+
+    @Test
+    public void addBusyParticipantToMeeting(){
+        App testApp = new App();
+
+        testApp.addRoom("r");
+        testApp.addRoom("r2");
+
+        testApp.getRoom("r").addAvailableTime(new MeetingTime(2019,10,2,11,0,3));
+        testApp.getRoom("r2").addAvailableTime(new MeetingTime(2019,10,2,11,0,3));
+
+        //add meetings
+        testApp.getRoom("r").addMeeting(new Meeting("test",new MeetingTime(2019,10,2,11,0,1)));
+        testApp.getRoom("r2").addMeeting(new Meeting("test2",new MeetingTime(2019,10,2,11,0,1)));
+        //create uses
+        testApp.addUser("ua");
+
+        //add to first meeting
+        testApp.getRoom("r").getMeeting("test").addParticipant(testApp.getParticipant("ua"));
+
+        //add ua to meeting when his busy
+        testApp.getRoom("r2").addParticipantToMeeting("test2",testApp.getParticipant("ua"));
+        //check
+        Assert.assertEquals(testApp.getRoom("r2").getMeeting("test2").participants,new ArrayList<Participant>());
+    }
+
+
+    @Test
+    public void removeParticipant(){
+
+        App testApp = new App();
+
+        testApp.addRoom("r");
+
+        testApp.getRoom("r").addAvailableTime(new MeetingTime(2019,10,2,11,0,3));
+
+        //add meetings
+        testApp.getRoom("r").addMeeting(new Meeting("test",new MeetingTime(2019,10,2,11,0,1)));
+        //create users
+        testApp.addUser("ua");
+        testApp.addUser("ub");
+
+        //add participant
+        testApp.getRoom("r").addParticipantToMeeting("test",testApp.getParticipant("ua"));
+        testApp.getRoom("r").addParticipantToMeeting("test",testApp.getParticipant("ub"));
+
+        ArrayList<Participant> testParticipantList = new ArrayList<>();
+        testParticipantList.add(new Participant("ub"));
+
+        //remove 1st one
+        testApp.getRoom("r").removeParticipantFromMeeting("test","ua");
+        //check
+        Assert.assertEquals(testApp.getRoom("r").getMeeting("test").participants,testParticipantList);
+        //remove 2nd
+        testApp.getRoom("r").removeParticipantFromMeeting("test","ub");
+        //check
+        Assert.assertEquals(testApp.getRoom("r").getMeeting("test").participants,new ArrayList<Participant>());
+
+    }
 
 }

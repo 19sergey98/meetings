@@ -81,11 +81,11 @@ public class Participant implements Serializable {
                     (
                             potMeetingTime.getStartDate().getTimeInMillis() < this.schedule.get(i).getMeetingTime().getFinishDate().getTimeInMillis()
                                     &&
-                                    potMeetingTime.getStartDate().getTimeInMillis() > this.schedule.get(i).getMeetingTime().getStartDate().getTimeInMillis()
+                                    potMeetingTime.getStartDate().getTimeInMillis() >= this.schedule.get(i).getMeetingTime().getStartDate().getTimeInMillis()
                     )
                             ||
                             (
-                                    potMeetingTime.getFinishDate().getTimeInMillis() < this.schedule.get(i).getMeetingTime().getFinishDate().getTimeInMillis()
+                                    potMeetingTime.getFinishDate().getTimeInMillis() <= this.schedule.get(i).getMeetingTime().getFinishDate().getTimeInMillis()
                                             &&
                                             potMeetingTime.getFinishDate().getTimeInMillis() > this.schedule.get(i).getMeetingTime().getStartDate().getTimeInMillis()
                             )
